@@ -1,0 +1,1 @@
+# Rust binaries for NetBSD
