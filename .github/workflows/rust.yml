@@ -33,7 +33,7 @@ jobs:
           (cd build/x86_64-unknown-linux-gnu/llvm/build && ln -s ../include ../lib .)
           rm -f llvm-x86_64-unknown-linux-gnu.txz
 
-          ./configure --host $HOSTS --target $HOSTS --release-channel=stable --disable-dist-src --disable-docs --disable-compiler-docs --set=build.verbose=2
+          ./configure --host $HOSTS --target $HOSTS --release-channel=stable --enable-extended --disable-dist-src --disable-docs --disable-compiler-docs --set=build.verbose=2
 
           python3 x.py dist
           python3 x.py dist cargo
@@ -41,42 +41,9 @@ jobs:
           HOSTS: i686-unknown-netbsd
 
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Rust ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-      - name: Upload rustc
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/dist/rustc-${{ env.RUST_VERSION }}-i686-unknown-netbsd.tar.xz
-          asset_name: rustc-${{ env.RUST_VERSION }}-i686-unknown-netbsd.tar.xz
-          asset_content_type: application/octet-stream
-
-      - name: Upload rust-std
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/dist/rust-std-${{ env.RUST_VERSION }}-i686-unknown-netbsd.tar.xz
-          asset_name: rust-std-${{ env.RUST_VERSION }}-i686-unknown-netbsd.tar.xz
-          asset_content_type: application/octet-stream
-
-      - name: Upload cargo
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/dist/cargo-${{ env.RUST_VERSION }}-i686-unknown-netbsd.tar.xz
-          asset_name: cargo-${{ env.RUST_VERSION }}-i686-unknown-netbsd.tar.xz
-          asset_content_type: application/octet-stream
+          artifacts: "build/dist/rust-${{ env.RUST_VERSION }}-i686-unknown-netbsd.tar.xz"
+          artifactContentType: application/octet-stream
+          name: Rust ${{ env.RUST_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
